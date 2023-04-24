@@ -1,6 +1,5 @@
 import styled from "styled-components"
 import MyWalletLogo from "../components/MyWalletLogo"
-import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom"
 import { useContext} from "react"
 import axios from "axios"
