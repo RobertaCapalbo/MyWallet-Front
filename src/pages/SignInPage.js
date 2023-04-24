@@ -3,19 +3,18 @@ import { Link, useNavigate } from "react-router-dom"
 import MyWalletLogo from "../components/MyWalletLogo"
 import { useContext} from "react"
 import axios from "axios"
-import usDt from "../context/usDt"
 import usCtx from '../context/usCtx';
 
 
 export default function SignInPage() {
-
+  let {email, setEmail, password, setPassword, setUsername} = useContext(usCtx);
   const navigate = useNavigate();
   const loginInfos = {
     email,
     password
   }
-  const {setToken} = useContext(usDt)
-  let {email, setEmail, password, setPassword, setUsername} = useContext(usCtx);
+  const {setToken} = useContext(usCtx)
+  
   
   function handleForm(retorno){
     retorno.preventDefault();
