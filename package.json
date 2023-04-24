@@ -11,7 +11,8 @@
     "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
     "styled": "^1.0.0",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "user-context": "^1.0.14"
   },
   "scripts": {
     "start": "react-scripts start",
