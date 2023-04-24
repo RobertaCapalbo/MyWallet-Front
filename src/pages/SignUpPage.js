@@ -20,7 +20,7 @@ export default function SignUpPage() {
   function handleForm(retorno){
     retorno.preventDefault();
     const promise = axios.post('http://localhost:5000/sign-up', signupInfos)
-    promise.then(res => {setName(''); navigate('/home'); setEmail(''); setPassword(''); setconfirmPassword('');})
+    promise.then(res => {setName(''); navigate('/'); setEmail(''); setPassword(''); setconfirmPassword('');})
     promise.catch(err => {console.log(err)});
 }
 

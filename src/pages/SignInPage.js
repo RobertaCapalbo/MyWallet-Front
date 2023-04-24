@@ -20,7 +20,7 @@ export default function SignInPage() {
   function handleForm(retorno){
     retorno.preventDefault();
     const promise = axios.post('http://localhost:5000/sign-in', loginInfos)
-    promise.then(res => {setToken(res.data); navigate("/home"); setEmail('');
+    promise.then(res => {setToken(res.data); navigate("/"); setEmail('');
     setPassword('');setUsername(res.data.username);})
     promise.catch(err => {console.log(err)})}
   
