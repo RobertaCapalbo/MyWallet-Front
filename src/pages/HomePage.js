@@ -1,53 +1,100 @@
 import styled from "styled-components"
+import { useNavigate } from "react-router-dom"
+import { useEffect, useState, useContext } from "react"
+import axios from 'axios';
+import UserContext from "../context/usCtx"
 import { BiExit } from "react-icons/bi"
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
 
 export default function HomePage() {
+const navigate = useNavigate()
+  const url = process.env.REACT_APP_BASE_URL
+  const { token, setToken, recordsList, setRecordsList, setType, name } = useContext(UserContext)
+  const [balance, setBalance] = useState(0)
+  useEffect(() => {
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+    setToken(localStorage.getItem("token"))
+    if(!localStorage.getItem("token")){
+      navigate("/")
+    }
+    const promise = axios.get(`${url}/records`, config)
+    promise.then((a) => {
+      const array = a.data
+      const reverseArray = array.reverse()
+      setRecordsList(reverseArray)
+    })
+    promise.catch(err => {console.log(err)})}, [])
+
+    useEffect(() => {
+      const totalIncome = recordsList
+        .filter((t) => t.tipo === "entrada")
+        .reduce((acc, t) => acc + t.value, 0);
+      const totalExpense = recordsList
+        .filter((t) => t.tipo === "saida")
+        .reduce((acc, t) => acc + t.value, 0);
+      setBalance(totalIncome - totalExpense);
+    }, [recordsList]);
+
+  function In() {
+    setType("in")
+    navigate("/newTransaction/in")
+  }
+  function Out() {
+    setType("out")
+    navigate("/newTransaction/out")
+  }
+
   return (
     <HomeContainer>
       <Header>
-        <h1>Olá, Fulano</h1>
+        <h1>{`Olá, ${name}`}</h1>
         <BiExit />
       </Header>
 
       <TransactionsContainer>
         <ul>
-          <ListItemContainer>
-            <div>
-              <span>30/11</span>
-              <strong>Almoço mãe</strong>
-            </div>
-            <Value color={"negativo"}>120,00</Value>
-          </ListItemContainer>
-
-          <ListItemContainer>
-            <div>
-              <span>15/11</span>
-              <strong>Salário</strong>
-            </div>
-            <Value color={"positivo"}>3000,00</Value>
-          </ListItemContainer>
+        {recordsList.map(item => <Item key={item._id}
+            value={item.valor}
+            description={item.descricao}
+            type={item.tipo}>
+          </Item>)}
         </ul>
 
         <article>
           <strong>Saldo</strong>
-          <Value color={"positivo"}>2880,00</Value>
+          <Value color={balance() >= 0 }>{balance()}</Value>
         </article>
       </TransactionsContainer>
 
 
-      <ButtonsContainer>
-        <button>
+      <ButtonsContainer>  
+        <button onClick={In}>
           <AiOutlinePlusCircle />
           <p>Nova <br /> entrada</p>
         </button>
-        <button>
+        <button onClick={Out}>
           <AiOutlineMinusCircle />
           <p>Nova <br />saída</p>
         </button>
       </ButtonsContainer>
 
     </HomeContainer>
+  )
+}
+
+function Item(props) {
+  const { value, description, type, date } = props
+
+  return (
+    <ListItemContainer>
+      <div>
+        <span>{date}</span>
+        <strong>{description}</strong>
+      </div>
+      <Value color={type === "in" ? "positivo" : "negativo"}>{value}</Value>
+    </ListItemContainer>
   )
 }
 
