@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useEffect, useState, useContext } from "react"
 import axios from 'axios';
 import UserContext from "../context/usCtx"
@@ -7,74 +7,90 @@ import { BiExit } from "react-icons/bi"
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai"
 
 export default function HomePage() {
-const navigate = useNavigate()
-  const url = process.env.REACT_APP_BASE_URL
-  const { token, setToken, recordsList, setRecordsList, setType, name } = useContext(UserContext)
+  const navigate = useNavigate()
+  const { setToken, transactionList, setTransactionList, setType, name } = useContext(UserContext)
   const [balance, setBalance] = useState(0)
   useEffect(() => {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` }
-    }
-    setToken(localStorage.getItem("token"))
     if(!localStorage.getItem("token")){
+      alert("Usuario sem login")
       navigate("/")
     }
-    const promise = axios.get(`${url}/records`, config)
+    setToken(localStorage.getItem("token"))
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    }
+    const promise = axios.get("http://localhost:5000/records", config)
     promise.then((a) => {
       const array = a.data
       const reverseArray = array.reverse()
-      setRecordsList(reverseArray)
+      setTransactionList(reverseArray)
     })
-    promise.catch(err => {console.log(err)})}, [])
+    promise.catch((a) => {
+      console.log("erro", a.message)
+    })
+  }, [])
 
-    useEffect(() => {
-      const totalIncome = recordsList
-        .filter((t) => t.tipo === "entrada")
-        .reduce((acc, t) => acc + t.value, 0);
-      const totalExpense = recordsList
-        .filter((t) => t.tipo === "saida")
-        .reduce((acc, t) => acc + t.value, 0);
-      setBalance(totalIncome - totalExpense);
-    }, [recordsList]);
+  useEffect(() => {
+    const array = transactionList
+    let finalValue = 0
+    array.forEach((a) => {
+      if (a.type === "in") {
+        finalValue = finalValue + a.value
+        setBalance(finalValue.toFixed(2))
+      }
+      else if (a.type === "out") {
+        finalValue = finalValue - a.value
+        setBalance(finalValue.toFixed(2))
+      }
+    })
+  }, [transactionList])
 
-  function In() {
+  function typeIn() {
     setType("in")
-    navigate("/newTransaction/in")
+    navigate("/nova-transacao/in")
   }
-  function Out() {
+  function typeOut() {
     setType("out")
-    navigate("/newTransaction/out")
+    navigate("/nova-transacao/out")
+  }
+
+  function logout() {
+    localStorage.removeItem("token")
+    navigate("/")
   }
 
   return (
     <HomeContainer>
       <Header>
         <h1>{`Olá, ${name}`}</h1>
-        <BiExit />
+        <BiExit onClick={logout} />
       </Header>
-
       <TransactionsContainer>
-        <ul>
-        {recordsList.map(item => <Item key={item._id}
-            value={item.valor}
-            description={item.descricao}
-            type={item.tipo}>
-          </Item>)}
-        </ul>
-
-        <article>
+        <ListContainer>
+          <ul>
+            {transactionList.map((a) => <DisplayTransactions
+              balance={balance}
+              setBalance={setBalance}
+              key={a._id}
+              value={a.value}
+              description={a.description}
+              type={a.type}
+              date={a.date} />)}
+          </ul>
+        </ListContainer>
+        <SaldoContainer>
           <strong>Saldo</strong>
-          <Value color={balance() >= 0 }>{balance()}</Value>
-        </article>
+          <Value color={balance >= 0 ? "positivo" : "negativo"}>{balance}</Value>
+        </SaldoContainer>
       </TransactionsContainer>
 
 
-      <ButtonsContainer>  
-        <button onClick={In}>
+      <ButtonsContainer>
+        <button onClick={typeIn}>
           <AiOutlinePlusCircle />
           <p>Nova <br /> entrada</p>
         </button>
-        <button onClick={Out}>
+        <button onClick={typeOut}>
           <AiOutlineMinusCircle />
           <p>Nova <br />saída</p>
         </button>
@@ -84,7 +100,7 @@ const navigate = useNavigate()
   )
 }
 
-function Item(props) {
+function DisplayTransactions(props) {
   const { value, description, type, date } = props
 
   return (
@@ -114,14 +130,19 @@ const Header = styled.header`
 `
 const TransactionsContainer = styled.article`
   flex-grow: 1;
+  position:relative;
   background-color: #fff;
   color: #000;
   border-radius: 5px;
   padding: 16px;
   display: flex;
+  overflow-y: auto;
   flex-direction: column;
   justify-content: space-between;
   article {
+    position: absolute;
+    bottom: 10px;
+    left: 16px;
     display: flex;
     justify-content: space-between;   
     strong {
@@ -130,6 +151,35 @@ const TransactionsContainer = styled.article`
     }
   }
 `
+
+const ListContainer = styled.div`
+  overflow-y:scroll;
+  margin-bottom:16px;
+  article {
+    position: absolute;
+    bottom: 10px;
+    left: 16px;
+    display: flex;
+    justify-content: space-evenly;   
+    strong {
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  }
+`
+
+const SaldoContainer = styled.div`
+  position: absolute;
+  bottom: 10px;
+  left: 16px;
+  display: flex;
+  justify-content: space-between;   
+  strong {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+`
+
 const ButtonsContainer = styled.section`
   margin-top: 15px;
   margin-bottom: 0;
@@ -153,6 +203,7 @@ const Value = styled.div`
   font-size: 16px;
   text-align: right;
   color: ${(props) => (props.color === "positivo" ? "green" : "red")};
+  margin-left: 10px;
 `
 const ListItemContainer = styled.li`
   display: flex;

@@ -7,18 +7,21 @@ import TransactionsPage from "./pages/TransactionPage"
 import UserContext from "./context/usCtx";
 import { useState } from "react"
 
+
 export default function App() {
   const [email, setEmail] = useState([]);
   const [password, setPassword] = useState([]);
+  const [transactionList, setTransactionList] = useState([]);
   const [username, setUsername]= useState([]);
   const [token, setToken]= useState([]);
+  const [type, setType]= useState([]);
   const [confirmPassword, setconfirmPassword]= useState([]);
   const [name, setName]= useState([]);
 
-const info = {token, setToken, email, setEmail, password, setPassword, username, setUsername, confirmPassword, setconfirmPassword, name, setName}
+const info = {setType, type, transactionList, setTransactionList, token, setToken, email, setEmail, password, setPassword, username, setUsername, confirmPassword, setconfirmPassword, name, setName}
 
   return (
-    <UserContext.Provider value={{info}}>
+    <UserContext.Provider value={info}>
     <PagesContainer>
       <BrowserRouter>
           <Routes>

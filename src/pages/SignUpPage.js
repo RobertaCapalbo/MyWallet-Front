@@ -1,38 +1,53 @@
 import styled from "styled-components"
 import MyWalletLogo from "../components/MyWalletLogo"
 import { Link, useNavigate } from "react-router-dom"
-import { useContext} from "react"
+import { useState, useContext } from "react"
 import axios from "axios"
 import UserContext from '../context/usCtx.js';
 
 export default function SignUpPage() {
-
-  const navigate = useNavigate();
-  const {email, setEmail, password, setPassword, name, setName, confirmPassword, setconfirmPassword} = useContext(UserContext);
-  const signupInfos = {
-      name,
-      email,
-      password,
-      confirmPassword
+  const navigate = useNavigate()
+  const url = process.env.REACT_APP_BASE_URL
+  const [form, setForm] = useState({ name: "", email: "", password: ""})
+  const [isDisabled, setIsDisabled] = useState(false)
+  let repeatPassword = ""
+  function handleForm(event) {
+    if(event.target.name === "repeatPassword"){
+      repeatPassword = event.target.value
+      console.log(repeatPassword)
+      console.log(process.env.REACT_APP_BASE_URL)
+    }
+    else{
+      setForm({ ...form, [event.target.name]: event.target.value })
+      console.log(form)
+    }
+    
   }
-
-  function handleForm(retorno){
-    retorno.preventDefault();
-    const promise = axios.post('http://localhost:5000/sign-up', signupInfos)
-    promise.then(res => {setName(''); navigate('/'); setEmail(''); setPassword(''); setconfirmPassword('');})
-    promise.catch(err => {console.log(err)});
-}
-
-  
-
+  function signUp(e) {
+    e.preventDefault()
+    if(form.password !== repeatPassword){
+     return alert("Senhas diferentes")
+    }
+    
+    const promise = axios.post("http://localhost:5000/sign-up", form)
+    setIsDisabled(true)
+    promise.then((a) => {
+      navigate("/")
+      setIsDisabled(false)
+    })
+    promise.catch((a) => {
+      alert(a)
+      setIsDisabled(false)
+    })
+  }
   return (
     <SingUpContainer>
-      <form onSubmit={handleForm}>
+      <form onSubmit={signUp}>
         <MyWalletLogo />
-        <input placeholder="Nome" type="text" name='name' required value={name} onChange={handleForm}/>
-        <input placeholder="E-mail" type="email" name='email' required value={email} onChange={handleForm}/>
-        <input placeholder="Senha" type="password" autocomplete="new-password" name='password' required value={password} onChange={handleForm}/>
-        <input placeholder="Confirme a senha" type="password" autocomplete="new-password" name='password' required  value={confirmPassword} onChange={handleForm}/>
+        <input placeholder="Nome" type="text" name='name' required onChange={handleForm}/>
+        <input placeholder="E-mail" type="email" name='email' required onChange={handleForm}/>
+        <input placeholder="Senha" type="password" autocomplete="new-password" name='password' required onChange={handleForm}/>
+        <input placeholder="Confirme a senha" type="password" autoComplete="new-password" required  name={"repeatPassword"} onChange={handleForm}/>
         <button>Cadastrar</button>
       </form>
 
