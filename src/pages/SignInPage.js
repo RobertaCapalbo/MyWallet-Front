@@ -10,7 +10,7 @@ export default function SignInPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: "", password: "" })
   const [isDisabled, setIsDisabled] = useState(false)
-  const { token, setToken, name, setName } = useContext(UserContext)
+  const {  setToken,  setName } = useContext(UserContext)
   function handleForm(event) {
     setForm({ ...form, [event.target.name]: event.target.value })
   }

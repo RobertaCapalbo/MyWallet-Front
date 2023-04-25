@@ -1,13 +1,12 @@
 import styled from "styled-components"
 import MyWalletLogo from "../components/MyWalletLogo"
 import { Link, useNavigate } from "react-router-dom"
-import { useState, useContext } from "react"
+import { useState } from "react"
 import axios from "axios"
 import UserContext from '../context/usCtx.js';
 
 export default function SignUpPage() {
   const navigate = useNavigate()
-  const url = process.env.REACT_APP_BASE_URL
   const [form, setForm] = useState({ name: "", email: "", password: ""})
   const [isDisabled, setIsDisabled] = useState(false)
   let repeatPassword = ""

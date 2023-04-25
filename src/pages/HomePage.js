@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useEffect, useState, useContext } from "react"
 import axios from 'axios';
 import UserContext from "../context/usCtx"
