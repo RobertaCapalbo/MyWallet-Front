@@ -12,7 +12,6 @@ export default function HomePage() {
   const [balance, setBalance] = useState(0)
   useEffect(() => {
     if(!localStorage.getItem("token")){
-      alert("Usuario sem login")
       navigate("/")
     }
     setToken(localStorage.getItem("token"))
@@ -20,36 +19,36 @@ export default function HomePage() {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     }
     const promise = axios.get("http://localhost:5000/records", config)
-    promise.then((a) => {
-      const array = a.data
-      const reverseArray = array.reverse()
-      setTransactionList(reverseArray)
+    promise.then((resposta) => {
+      const array = resposta.data
+      const reverse = array.reverse()
+      setTransactionList(reverse)
     })
-    promise.catch((a) => {
-      console.log("erro", a.message)
+    promise.catch((resposta) => {
+      console.log(resposta.message)
     })
   }, [])
 
   useEffect(() => {
     const array = transactionList
     let finalValue = 0
-    array.forEach((a) => {
-      if (a.type === "in") {
-        finalValue = finalValue + a.value
+    array.forEach((resposta) => {
+      if (resposta.type === "in") {
+        finalValue = finalValue + resposta.value
         setBalance(finalValue.toFixed(2))
       }
-      else if (a.type === "out") {
-        finalValue = finalValue - a.value
+      else if (resposta.type === "out") {
+        finalValue = finalValue - resposta.value
         setBalance(finalValue.toFixed(2))
       }
     })
   }, [transactionList])
 
-  function typeIn() {
+  function In() {
     setType("in")
     navigate("/nova-transacao/in")
   }
-  function typeOut() {
+  function Out() {
     setType("out")
     navigate("/nova-transacao/out")
   }
@@ -68,14 +67,14 @@ export default function HomePage() {
       <TransactionsContainer>
         <ListContainer>
           <ul>
-            {transactionList.map((a) => <DisplayTransactions
+            {transactionList.map((resposta) => <Transactions
               balance={balance}
               setBalance={setBalance}
-              key={a._id}
-              value={a.value}
-              description={a.description}
-              type={a.type}
-              date={a.date} />)}
+              key={resposta._id}
+              value={resposta.value}
+              description={resposta.description}
+              type={resposta.type}
+              date={resposta.date} />)}
           </ul>
         </ListContainer>
         <SaldoContainer>
@@ -86,11 +85,11 @@ export default function HomePage() {
 
 
       <ButtonsContainer>
-        <button onClick={typeIn}>
+        <button onClick={In}>
           <AiOutlinePlusCircle />
           <p>Nova <br /> entrada</p>
         </button>
-        <button onClick={typeOut}>
+        <button onClick={Out}>
           <AiOutlineMinusCircle />
           <p>Nova <br />saída</p>
         </button>
@@ -100,7 +99,7 @@ export default function HomePage() {
   )
 }
 
-function DisplayTransactions(props) {
+function Transactions(props) {
   const { value, description, type, date } = props
 
   return (
