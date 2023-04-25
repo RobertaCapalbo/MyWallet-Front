@@ -12,32 +12,31 @@ export default function TransactionsPage() {
 
   useEffect(()=>{
     if(!localStorage.getItem("token")){
-      alert("Usuario sem login")
       navigate("/")
     }
   },[])
 
   function postTransaction(event){
     event.preventDefault()
-    const valueNumber = parseFloat(form.value)
+    const total = parseFloat(form.value)
     const config = {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     }
-    const body={value:valueNumber, description: form.description, type: type}
+    const body={value:total, description: form.description, type: type}
     axios.post(`http://localhost:5000/newTransaction/${type}`, body, config)
       .then(()=>{
         navigate("/home")})
-      .catch((a) => alert(a))
+      .catch((resposta) => alert(resposta))
   }
-  function handleChange(event) {
+  function handleForm(event) {
     setForm({ ...form, [event.target.name]: event.target.value })
   }
   return (
     <TransactionsContainer>
       <h1>{`Nova ${type}`}</h1>
       <form onSubmit={postTransaction}>
-        <input placeholder="Valor" name="value" type="text" onChange={handleChange} disabled={isDisabled}/>
-        <input placeholder="Descrição" name="description" type="text" onChange={handleChange} disabled={isDisabled}/>
+        <input placeholder="Valor" name="value" type="text" onChange={handleForm} disabled={isDisabled}/>
+        <input placeholder="Descrição" name="description" type="text" onChange={handleForm} disabled={isDisabled}/>
         <button type="submit" disabled={isDisabled}>{`Salvar ${type}`}</button>
       </form>
     </TransactionsContainer>
